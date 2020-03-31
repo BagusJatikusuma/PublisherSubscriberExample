@@ -5,36 +5,12 @@ import zio.console._
 import zio.clock._
 import zio.duration._
 
-import terminal._
-import terminal.TerminalService
 import file._
 import file.FileLive
 import partition._
 import domain._
 
-import zio.interop.catz._
-import io.iteratee._
-
-import id.nukuba.loop._
-import scala.util.Random
-
 object Main extends scala.App {
-
-  type AppTask[A] = RIO[ZEnv, A]
-
-  def streamIteratee = {
-    val enumerator: Enumerator[AppTask, Int] = Enumerator.iterate(1)(_ + 1)
-    val enumeratee: Enumeratee[AppTask, Int, Int] = Enumeratee.filter(_ % 2 == 0)
-    val iteratee = Iteratee.takeWhile[AppTask, Int](_ < 50).through(enumeratee)
-
-    iteratee(enumerator).run
-  }
-
-  val terminalEnv = Console.live >>> TerminalService.live 
-
-  def programSimple = (for {
-    _   <- loop
-  } yield ()).provideSomeLayer[ZEnv](terminalEnv ++ RunLoopLive.live)
 
   def createEmptyQueues = Ref.make(Map.empty[Int, Queue[(PublisherState, List[String])]])
 
